@@ -20,7 +20,7 @@ The supplied NFL file covers calendar years 2001–2019, so current-game MLB/NBA
 
 At the NFL anchor, the home-team-clustered Wald p-values are 0.014 for MLB and 0.068 for NBA. The search tests each integer percentile from 1% through 99%, every observed margin-cutoff transition, and the exact NFL anchor. No conventional joint partial F exceeds 10. The highest conventional F is 3.47 for MLB at a 1-run cutoff and 4.17 for NBA at a zero-point cutoff. Some other thresholds have clustered Wald p-values below .05, but their conventional partial F values remain below 10. The largest clustered Wald F values (184.99 for NBA and 21.39 for MLB) occur at near-degenerate cutoffs that classify 0.008% of NBA prior games or 99.998% of MLB prior games as close; they are not treated as useful first stages. The complete grid and edge cases are documented in `results/first_stage/report.md` and `results/first_stage/common_percentile_grid.csv`.
 
-Because no tested threshold meets F > 10, the processed first-stage samples retain the NFL anchor and are explicitly marked as not passing that relevance screen. The repository stops before the second stage, as requested.
+Because no tested close-game threshold meets F > 10, the processed first-stage samples retain the NFL anchor and are explicitly marked as not passing that relevance screen. The repository stops before the second stage, as requested.
 
 ## Data and folders
 
@@ -32,8 +32,12 @@ Because no tested threshold meets F > 10, the processed first-stage samples reta
 | `scripts/first_stage.py` | Computes the NFL anchor, calibrates margins, estimates first stages, and writes summaries. |
 | `scripts/schedule_conflict_iv_first_stage.py` | Screens same-market cross-league scheduling conflicts as attendance instruments, including an exact-date fixed-effect check. |
 | `scripts/weather_iv_first_stage.py` | Screens NASA POWER pregame weather as an NBA attendance instrument. |
-| `Data/external/` | Matched hourly NASA POWER weather by NBA game. |
+| `Data/external/` | Matched hourly NASA POWER weather by NBA game and MLB dome-site game. |
 | `results/instrument_candidates/` | First-stage screens and exclusion-restriction discussion for alternative IV candidates. |
+| `scripts/expanded_iv_screen.py` | Screens schedule, calendar, rest, and lagged-attendance candidates. |
+| `scripts/team_season_fe_candidate_robustness.py` | Re-estimates baseline-strong alternatives with team-season fixed effects. |
+| `scripts/team_season_date_fe_candidate_robustness.py` | Checks baseline-strong alternatives with team-season and exact-date fixed effects. |
+| `scripts/compile_iv_candidate_inventory.py` | Combines the original and expanded first-stage grids. |
 | `notebooks/01_first_stage.ipynb` | Guided, reproducible first-stage workflow. |
 | `notebooks/archive/FirstStage_exploratory.ipynb` | Original untracked `hidden owl` Codespaces notebook, retained as an audit trail. |
 | `results/cleaning/` | Coverage, attendance-quality, and prior-history summaries. |
@@ -50,6 +54,15 @@ python scripts/prepare_data.py
 python scripts/first_stage.py
 python scripts/schedule_conflict_iv_first_stage.py
 python scripts/weather_iv_first_stage.py
+python scripts/expanded_iv_screen.py
+python scripts/team_season_fe_candidate_robustness.py
+python scripts/team_season_date_fe_candidate_robustness.py
+python scripts/nba_weather_window_search.py
+python scripts/nba_weather_threshold_robustness.py
+python scripts/mlb_dome_weather_screen.py
+python scripts/mlb_dome_weather_robustness.py
+python scripts/mlb_recorded_weather_screen.py
+python scripts/compile_iv_candidate_inventory.py
 ```
 
 The preparation script keeps raw files unchanged. It standardizes dates, season IDs, team IDs, scores, attendance, and game types; excludes NBA preseason and MLB exhibition/All-Star games from team-game histories; and adds the preceding same-season game for each side. Histories are built before excluding current games with unusable attendance, so a game can remain a valid prior game even if its own attendance is missing.
@@ -58,17 +71,24 @@ Attendance must be positive and numeric for a current-game first-stage observati
 
 Only current games in calendar years 2001–2019 enter the MLB/NBA first-stage samples; cleaned files and prior-game histories preserve full source coverage. The percentile search tests 1%, 2%, up through 99%, each discrete margin-cutoff transition, and the exact NFL anchor. The models include home-team, away-team, season, game-type, weekday, and month fixed effects, and use separate close-prior-game indicators for the current home and away teams. Standard errors are clustered by current home team.
 
-## Alternative IV screen
+## Initial alternative IV screen
 
 The first-stage-only screen tested weather before NBA games and same-market cross-league game conflicts for MLB and NBA. None meets a clustered F > 10 screen in both leagues, and none has a proven exclusion restriction. See `results/instrument_candidates/candidate_screen_report.md`. The schedule-conflict script also reports a specification with exact calendar-date fixed effects. The weather analysis uses NASA POWER hourly MERRA-2-based estimates; its game-level matched data are saved in `Data/external/` so the screen can be reproduced without refetching.
+
+## Expanded IV search
+
+The broader exploratory search tests calendar timing, openers, attendance history, NBA weather thresholds, and MLB weather. It keeps all earlier reports and outputs. The consolidated findings, first-stage comparisons, and exclusion concerns are in [`results/instrument_candidates/expanded_candidate_report.md`](results/instrument_candidates/expanded_candidate_report.md). The sortable [`all_candidate_inventory.csv`](results/instrument_candidates/all_candidate_inventory.csv) compiles each candidate and specification from the original and expanded screens.
+
+Strong schedule-based first stages in both leagues include weekend games, home openers, and U.S. federal holidays. Home openers remain strong after exact-date effects; weekend and holiday indicators are absorbed by exact-date effects because they vary only by date. Prior attendance measures are even more predictive but have serious exclusion concerns. For MLB only, selected cold-weather thresholds for dome-marked games retain two-way clustered F > 10 after exact-date and team-season controls, using just 10 home-team clusters. MLB recorded outdoor temperature is predictive but can directly affect play. NBA weather thresholds and same-market schedule conflicts do not reach two-way clustered F > 10. No exclusion restriction is established and no second stage is estimated.
 
 ## Data sources
 
 | League | Source |
 |---|---|
-| MLB | [MLB Stats Format](https://github.com/btelle/mlb-stats-format) |
+| MLB | [MLB Stats Format](https://github.com/btelle/mlb-stats-format); weather fields follow [Retrosheet event-file documentation](https://www.retrosheet.org/eventfile.htm) |
 | NBA | [Historical NBA Data](https://www.kaggle.com/datasets/eoinamoore/historical-nba-data-and-player-box-scores) |
 | NFL | [NFL Attendance Data](https://github.com/emilp-tuwien/nfl-attendance-prediction) |
 | NBA weather | [NASA POWER hourly API](https://power.larc.nasa.gov/docs/services/api/temporal/hourly/) and [meteorology data sources](https://power.larc.nasa.gov/docs/methodology/data/sources_meteorology/) |
+| MLB dome-weather screen | [NASA POWER hourly API](https://power.larc.nasa.gov/docs/services/api/temporal/hourly/); dome marker from Retrosheet's `sky` field |
 
 **Course:** ECON521 — Causal Econometrics

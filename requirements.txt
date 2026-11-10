@@ -3,4 +3,5 @@ pandas
 scipy
 statsmodels
 patsy
+pyhdfe
 ipykernel
