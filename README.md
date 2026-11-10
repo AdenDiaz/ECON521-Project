@@ -2,9 +2,9 @@
 
 ## Research question
 
-What is the causal effect of fan attendance on home-team win percentage? The planned outcome is the current game's home-team result, and the treatment is paid/recorded attendance. The proposed instrument is whether each team's immediately previous game was close.
+What is the causal effect of fan attendance on home-team win percentage? The planned outcome is the current game's home-team result, and the treatment is paid/recorded attendance. The initial instrument proposal was whether each team's immediately previous game was close; its tested first stages are weak. Alternative candidates are documented in the first-stage-only screen below.
 
-This repository currently completes data preparation and the first-stage relevance analysis only. It does **not** estimate a home-win outcome equation or a second-stage IV effect. The exclusion restriction also remains an open concern: a close previous game may affect subsequent performance through team confidence, fatigue, or other channels besides attendance.
+This repository currently completes data preparation and first-stage relevance analysis only. It does **not** estimate a home-win outcome equation or a second-stage IV effect. The exclusion restriction cannot be established from a first-stage regression and remains unresolved for every candidate tested so far.
 
 ## League scope
 
@@ -30,6 +30,10 @@ Because no tested threshold meets F > 10, the processed first-stage samples reta
 | `Data/processed/` | Canonical cleaned game-level files and first-stage samples. |
 | `scripts/prepare_data.py` | Cleans raw sources and builds within-season prior-game histories. |
 | `scripts/first_stage.py` | Computes the NFL anchor, calibrates margins, estimates first stages, and writes summaries. |
+| `scripts/schedule_conflict_iv_first_stage.py` | Screens same-market cross-league scheduling conflicts as attendance instruments, including an exact-date fixed-effect check. |
+| `scripts/weather_iv_first_stage.py` | Screens NASA POWER pregame weather as an NBA attendance instrument. |
+| `Data/external/` | Matched hourly NASA POWER weather by NBA game. |
+| `results/instrument_candidates/` | First-stage screens and exclusion-restriction discussion for alternative IV candidates. |
 | `notebooks/01_first_stage.ipynb` | Guided, reproducible first-stage workflow. |
 | `notebooks/archive/FirstStage_exploratory.ipynb` | Original untracked `hidden owl` Codespaces notebook, retained as an audit trail. |
 | `results/cleaning/` | Coverage, attendance-quality, and prior-history summaries. |
@@ -44,6 +48,8 @@ Use Python 3.10 or newer. From the repository root:
 python -m pip install -r requirements.txt
 python scripts/prepare_data.py
 python scripts/first_stage.py
+python scripts/schedule_conflict_iv_first_stage.py
+python scripts/weather_iv_first_stage.py
 ```
 
 The preparation script keeps raw files unchanged. It standardizes dates, season IDs, team IDs, scores, attendance, and game types; excludes NBA preseason and MLB exhibition/All-Star games from team-game histories; and adds the preceding same-season game for each side. Histories are built before excluding current games with unusable attendance, so a game can remain a valid prior game even if its own attendance is missing.
@@ -52,6 +58,10 @@ Attendance must be positive and numeric for a current-game first-stage observati
 
 Only current games in calendar years 2001–2019 enter the MLB/NBA first-stage samples; cleaned files and prior-game histories preserve full source coverage. The percentile search tests 1%, 2%, up through 99%, each discrete margin-cutoff transition, and the exact NFL anchor. The models include home-team, away-team, season, game-type, weekday, and month fixed effects, and use separate close-prior-game indicators for the current home and away teams. Standard errors are clustered by current home team.
 
+## Alternative IV screen
+
+The first-stage-only screen tested weather before NBA games and same-market cross-league game conflicts for MLB and NBA. None meets a clustered F > 10 screen in both leagues, and none has a proven exclusion restriction. See `results/instrument_candidates/candidate_screen_report.md`. The schedule-conflict script also reports a specification with exact calendar-date fixed effects. The weather analysis uses NASA POWER hourly MERRA-2-based estimates; its game-level matched data are saved in `Data/external/` so the screen can be reproduced without refetching.
+
 ## Data sources
 
 | League | Source |
@@ -59,5 +69,6 @@ Only current games in calendar years 2001–2019 enter the MLB/NBA first-stage s
 | MLB | [MLB Stats Format](https://github.com/btelle/mlb-stats-format) |
 | NBA | [Historical NBA Data](https://www.kaggle.com/datasets/eoinamoore/historical-nba-data-and-player-box-scores) |
 | NFL | [NFL Attendance Data](https://github.com/emilp-tuwien/nfl-attendance-prediction) |
+| NBA weather | [NASA POWER hourly API](https://power.larc.nasa.gov/docs/services/api/temporal/hourly/) and [meteorology data sources](https://power.larc.nasa.gov/docs/methodology/data/sources_meteorology/) |
 
 **Course:** ECON521 — Causal Econometrics
