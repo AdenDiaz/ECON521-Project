@@ -4,7 +4,7 @@
 
 This run cleans the three supplied game files, then estimates first-stage attendance regressions for the MLB and NBA only. It does not estimate the home-win outcome equation or a second-stage IV effect.
 
-The main first-stage screen follows the existing notebook's proposed January 1960 cutoff for both MLB and NBA. Full-history results are reported separately as a sensitivity check because the notebook described that cutoff as provisional.
+The MLB and NBA current-game analysis is restricted to calendar years 2001–2019, matching the years covered by the supplied NFL file. The cleaned source files retain their full history; prior-game links are built from the full schedules before the current-game date restriction.
 
 ## NFL reference coverage
 
@@ -16,15 +16,15 @@ The same percentile means the MLB/NBA margin cutoff is the empirical inverse-CDF
 ## First-stage findings
 
 NFL-anchor percentile first-stage test passes F > 10 and home-team-cluster p < .05 in both leagues: False.
-Common percentile in the tested 5%–95% grid passes both criteria in both leagues: False.
+Common percentile in the tested 1%–99% grid and observed margin cutoffs passes both criteria in both leagues: False.
 Threshold selection mode: no_strong_threshold_found.
-Largest conventional joint F in the full tested grid: NBA: F=2.53 at p=65% (cutoff 12); MLB: F=2.03 at p=85% (cutoff 6).
-At the NFL anchor percentile, the discrete MLB/NBA score distributions yield achieved close-game shares of MLB: 29.82% (cutoff 1); NBA: 28.76% (cutoff 5).
-Full-history estimates at the NFL anchor: MLB: F=1.44, clustered p=0.781; NBA: F=0.08, clustered p=0.874.
+Largest conventional joint partial F in the full tested grid: MLB: F=3.47 at p=22.940932% (cutoff 1; close share 28.25492%); NBA: F=4.17 at p=0.004066% (cutoff 0; close share 0.00813%).
+Largest home-team-clustered Wald F by league: MLB: cluster-Wald F=21.39 at p=99.995934% (cutoff 22; close share 99.99786%; conventional F=0.40; clustered p=6.27e-05; active IVs=1); NBA: cluster-Wald F=184.99 at p=0.004066% (cutoff 0; close share 0.00813%; conventional F=4.17; clustered p=3.1e-17; active IVs=2).
+At the NFL anchor percentile, the discrete MLB/NBA score distributions yield achieved close-game shares of MLB: 28.25% (cutoff 1); NBA: 27.81% (cutoff 5).
 
 The selected first-stage model includes home-team, away-team, season, game-type, weekday, and month fixed effects. The excluded instruments are separate indicators for a close immediately previous game by the current home and away teams. Standard errors are clustered by current home team. The conventional joint partial F is reported alongside the home-team-cluster F and p-value.
 
-No tested threshold from the 5th through 95th percentile meets the F > 10 screen in either league; therefore no league-specific alternative is selected and the NFL anchor is retained for the prepared samples. F > 10 is a relevance screen, not evidence that the exclusion restriction holds. A previous close game can affect later team confidence or performance directly, so the exclusion restriction remains unresolved. No second-stage estimate is included.
+No tested threshold from the 1st through 99th percentile or any observed margin-cutoff transition has a conventional joint partial F above 10 in either league; therefore no league-specific alternative is selected and the NFL anchor is retained for the prepared samples. Clustered Wald p-values fall below .05 at some cutoffs, but the corresponding conventional partial Fs remain below 10. The largest clustered Wald tests occur at degenerate endpoints that classify almost no NBA games or almost every MLB game as close; those sparse or nearly constant indicators are not treated as useful first stages. F > 10 is a relevance screen, not evidence that the exclusion restriction holds. A previous close game can affect later team confidence or performance directly, so the exclusion restriction remains unresolved. No second-stage estimate is included.
 
 ## Cleaning decisions
 
@@ -35,4 +35,4 @@ No tested threshold from the 5th through 95th percentile meets the F > 10 screen
 - NBA preseason games and MLB exhibitions/All-Star games are excluded from the franchise-game history. Playoffs and in-season NBA cup games remain in the data.
 - NFL January/February dates are assigned to the calendar year after the season-start year; the season ID remains the source `year` field.
 
-See `nfl_reference.csv`, `common_percentile_grid.csv`, `selected_thresholds.csv`, `selected_first_stage.csv`, and `full_history_sensitivity.csv` for counts, cutoffs, coefficients, and F statistics.
+See `nfl_reference.csv`, `common_percentile_grid.csv`, `selected_thresholds.csv`, and `selected_first_stage.csv` for counts, cutoffs, coefficients, and F statistics.

@@ -1,8 +1,8 @@
 """Calibrate previous-game closeness and estimate first-stage attendance models.
 
-No home-win outcome regression is run here. The percentile grid spans the
-5th through 95th percentiles, plus the exact NFL-derived anchor, to check
-whether any plausible margin threshold yields a relevant first stage.
+No home-win outcome regression is run here. The search tests every integer
+percentile from 1 through 99, every observed margin-cutoff transition in
+either league, and the exact NFL-derived anchor.
 """
 from __future__ import annotations
 
@@ -13,17 +13,17 @@ import pandas as pd
 import patsy
 import scipy.stats as st
 import statsmodels.api as sm
-from statsmodels.stats.sandwich_covariance import cov_cluster
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "Data" / "processed"
 RESULTS = ROOT / "results" / "first_stage"
-NBA_MAX_ATTENDANCE = 100_000
-GRID = [i / 100 for i in range(5, 100, 5)]
+GRID = [i / 100 for i in range(1, 100)]
 ANCHOR_START_YEAR = 2000
 ANCHOR_END_YEAR = 2023
 ANCHOR_MARGIN = 3
-PRIMARY_SCOPE = "1960_plus"
+ANALYSIS_START_YEAR = 2001
+ANALYSIS_END_YEAR = 2019
+PRIMARY_SCOPE = f"{ANALYSIS_START_YEAR}_{ANALYSIS_END_YEAR}"
 
 
 def load_clean(league: str) -> pd.DataFrame:
@@ -51,8 +51,8 @@ def _reference_nfl() -> tuple[dict[str, object], float, pd.DataFrame]:
     ].copy()
     season_counts = reference.groupby("season_id").size()
     # The source is a 16-game-era regular-season file: 256 games is a complete
-    # 32-team season. Incomplete seasons are retained for the main anchor and
-    # removed only for the reported sensitivity check.
+    # 32-team season. Incomplete seasons remain in the anchor; their counts are
+    # reported so the coverage limitation is visible.
     complete_seasons = season_counts.index[season_counts.eq(256)]
     complete = reference.loc[reference["season_id"].isin(complete_seasons)]
     share = float(reference["abs_margin"].le(ANCHOR_MARGIN).mean())
@@ -79,9 +79,16 @@ def _reference_nfl() -> tuple[dict[str, object], float, pd.DataFrame]:
     return anchor, share, season_table
 
 
-def _prepare_sample(games: pd.DataFrame, start_year: int | None) -> tuple[pd.DataFrame, pd.Series]:
+def _prepare_sample(
+    games: pd.DataFrame,
+    start_year: int | None,
+    end_year: int | None = None,
+) -> tuple[pd.DataFrame, pd.Series]:
     if start_year is not None:
-        games = games.loc[games["game_date"].dt.year.ge(start_year)].copy()
+        in_window = games["game_date"].dt.year.ge(start_year)
+        if end_year is not None:
+            in_window &= games["game_date"].dt.year.le(end_year)
+        games = games.loc[in_window].copy()
     margin_distribution = games["abs_margin"].dropna()
     sample = games.loc[
         games["attendance"].notna()
@@ -97,43 +104,52 @@ def _prepare_sample(games: pd.DataFrame, start_year: int | None) -> tuple[pd.Dat
     return sample, margin_distribution
 
 
-def _restriction_matrix(names: list[str], instruments: list[str]) -> np.ndarray:
-    matrix = np.zeros((len(instruments), len(names)), dtype=float)
-    for row, name in enumerate(instruments):
-        matrix[row, names.index(name)] = 1.0
-    return matrix
-
-
-def fit_first_stage(sample: pd.DataFrame, cutoff: float, percentile: float, scope: str) -> dict[str, object]:
-    if sample.empty:
-        raise ValueError("The first-stage sample is empty after attendance and previous-game eligibility filters.")
-
-    home_close = sample["home_prev_game_abs_margin"].le(cutoff).astype(int)
-    away_close = sample["away_prev_game_abs_margin"].le(cutoff).astype(int)
-    instrument_frame = pd.DataFrame({
-        "home_prev_close": home_close.to_numpy(),
-        "away_prev_close": away_close.to_numpy(),
-    })
-    active = [name for name in instrument_frame if instrument_frame[name].nunique() > 1]
-
+def _model_state(sample: pd.DataFrame) -> dict[str, object]:
+    """Fit fixed-effect controls once; threshold models use Frisch-Waugh-Lovell residuals."""
     control_formula = (
         "1 + C(home_team_id) + C(away_team_id) + C(season_id) "
         "+ C(game_type) + C(game_weekday) + C(game_month)"
     )
-    controls = patsy.dmatrix(control_formula, sample, return_type="dataframe")
-    controls = controls.reset_index(drop=True)
+    controls = patsy.dmatrix(control_formula, sample, return_type="dataframe").to_numpy(dtype=float)
     y = sample["attendance"].to_numpy(dtype=float)
-    x = controls.copy()
-    if active:
-        for name in active:
-            x[name] = instrument_frame[name].to_numpy(dtype=float)
-    exog = x.to_numpy(dtype=float)
-    result = sm.OLS(y, exog, hasconst=True).fit()
-    names = list(x.columns)
-
+    controls_fit = sm.OLS(y, controls, hasconst=True).fit()
     home_clusters, home_labels = pd.factorize(sample["home_team_id"], sort=True)
-    cluster_df = max(1, len(home_labels) - 1)
+    return {
+        "controls": controls,
+        "controls_fit": controls_fit,
+        "y_residual": np.asarray(controls_fit.resid, dtype=float),
+        "home_clusters": home_clusters.astype(np.int64),
+        "home_labels": home_labels,
+    }
 
+
+def fit_first_stage(
+    sample: pd.DataFrame,
+    cutoff: float,
+    percentile: float,
+    scope: str,
+    model_state: dict[str, object] | None = None,
+) -> dict[str, object]:
+    if sample.empty:
+        raise ValueError("The first-stage sample is empty after attendance and previous-game eligibility filters.")
+    if model_state is None:
+        model_state = _model_state(sample)
+
+    home_close = sample["home_prev_game_abs_margin"].le(cutoff).to_numpy(dtype=float)
+    away_close = sample["away_prev_game_abs_margin"].le(cutoff).to_numpy(dtype=float)
+    raw_instruments = np.column_stack([home_close, away_close])
+    instrument_names = ["home_prev_close", "away_prev_close"]
+    active_positions = [
+        position for position in range(raw_instruments.shape[1])
+        if np.unique(raw_instruments[:, position]).size > 1
+    ]
+
+    controls = model_state["controls"]
+    controls_fit = model_state["controls_fit"]
+    y_residual = model_state["y_residual"]
+    home_clusters = model_state["home_clusters"]
+    home_labels = model_state["home_labels"]
+    cluster_df = max(1, len(home_labels) - 1)
     row: dict[str, object] = {
         "scope": scope,
         "league": str(sample["league"].iloc[0]),
@@ -150,7 +166,7 @@ def fit_first_stage(sample: pd.DataFrame, cutoff: float, percentile: float, scop
         "home_prev_close_cluster_se": np.nan,
         "away_prev_close_coef": np.nan,
         "away_prev_close_cluster_se": np.nan,
-        "active_instruments": len(active),
+        "active_instruments": 0,
         "joint_F_classical": np.nan,
         "joint_p_classical": np.nan,
         "joint_F_home_team_cluster": np.nan,
@@ -160,60 +176,109 @@ def fit_first_stage(sample: pd.DataFrame, cutoff: float, percentile: float, scop
         "home_prev_close_cluster_p": np.nan,
         "away_prev_close_cluster_p": np.nan,
     }
-    if not active:
+    if not active_positions:
         return row
 
-    restrictions = _restriction_matrix(names, active)
-    classic_test = result.f_test(restrictions)
-    row["joint_F_classical"] = float(np.asarray(classic_test.fvalue).squeeze())
-    row["joint_p_classical"] = float(np.asarray(classic_test.pvalue).squeeze())
+    pinv_controls = controls_fit.model.pinv_wexog
+    residualized = raw_instruments[:, active_positions] - controls @ (pinv_controls @ raw_instruments[:, active_positions])
+    # Remove instruments absorbed by fixed effects or collinear with another instrument.
+    independent_positions: list[int] = []
+    for position in range(residualized.shape[1]):
+        candidate = residualized[:, independent_positions + [position]]
+        if np.linalg.matrix_rank(candidate) == len(independent_positions) + 1:
+            independent_positions.append(position)
+    residualized = residualized[:, independent_positions]
+    active = [instrument_names[active_positions[position]] for position in independent_positions]
+    q = len(active)
+    row["active_instruments"] = q
+    if q == 0:
+        return row
 
-    covariance = cov_cluster(result, home_clusters, use_correction=True)
-    robust_test = result.f_test(restrictions, cov_p=covariance)
-    robust_f = float(np.asarray(robust_test.fvalue).squeeze())
-    robust_stat_p = float(st.f.sf(robust_f, len(active), cluster_df)) if robust_f >= 0 else np.nan
+    gram = residualized.T @ residualized
+    bread = np.linalg.inv(gram)
+    beta = bread @ (residualized.T @ y_residual)
+    model_residual = y_residual - residualized @ beta
+    rss_restricted = float(y_residual @ y_residual)
+    rss_full = float(model_residual @ model_residual)
+    rank_controls = int(controls_fit.model.rank)
+    residual_df = max(1, len(sample) - rank_controls - q)
+    classical_f = ((rss_restricted - rss_full) / q) / (rss_full / residual_df)
+    row["joint_F_classical"] = float(classical_f)
+    row["joint_p_classical"] = float(st.f.sf(classical_f, q, residual_df))
+
+    scores = residualized * model_residual[:, None]
+    n_clusters = len(home_labels)
+    cluster_sums = np.column_stack([
+        np.bincount(home_clusters, weights=scores[:, column], minlength=n_clusters)
+        for column in range(q)
+    ])
+    meat = cluster_sums.T @ cluster_sums
+    small_sample_correction = (n_clusters / (n_clusters - 1)) * ((len(sample) - 1) / (len(sample) - controls.shape[1] - q))
+    covariance = bread @ meat @ bread * small_sample_correction
+    robust_f = float((beta @ np.linalg.pinv(covariance) @ beta) / q)
     row["joint_F_home_team_cluster"] = robust_f
-    row["joint_p_home_team_cluster"] = robust_stat_p
+    row["joint_p_home_team_cluster"] = float(st.f.sf(robust_f, q, cluster_df)) if robust_f >= 0 else np.nan
 
-    params = np.asarray(result.params)
-    for name in ("home_prev_close", "away_prev_close"):
-        if name in names:
-            position = names.index(name)
-            estimate = float(params[position])
-            variance = float(covariance[position, position])
-            standard_error = float(np.sqrt(variance)) if variance > 0 else np.nan
-            t_value = estimate / standard_error if standard_error and np.isfinite(standard_error) else np.nan
-            t_p = float(2 * st.t.sf(abs(t_value), cluster_df)) if np.isfinite(t_value) else np.nan
-            row[f"{name}_coef"] = estimate
-            row[f"{name}_cluster_se"] = standard_error
-            row[f"{name}_cluster_p"] = t_p
-
-    for name, output in [("home_prev_close", "home_partial_F_classical"), ("away_prev_close", "away_partial_F_classical")]:
-        if name in names:
-            one_restriction = _restriction_matrix(names, [name])
-            row[output] = float(np.asarray(result.f_test(one_restriction).fvalue).squeeze())
+    for index, name in enumerate(active):
+        estimate = float(beta[index])
+        variance = float(covariance[index, index])
+        standard_error = float(np.sqrt(variance)) if variance > 0 else np.nan
+        t_value = estimate / standard_error if standard_error and np.isfinite(standard_error) else np.nan
+        t_p = float(2 * st.t.sf(abs(t_value), cluster_df)) if np.isfinite(t_value) else np.nan
+        row[f"{name}_coef"] = estimate
+        row[f"{name}_cluster_se"] = standard_error
+        row[f"{name}_cluster_p"] = t_p
+        partial_f = (estimate**2 / bread[index, index]) / (rss_full / residual_df)
+        row["home_partial_F_classical" if name == "home_prev_close" else "away_partial_F_classical"] = float(partial_f)
     return row
 
 
-def threshold_grid(league: str, games: pd.DataFrame, scope: str, start_year: int | None, percentiles: list[float]) -> tuple[list[dict[str, object]], pd.DataFrame]:
-    sample, margin_distribution = _prepare_sample(games, start_year)
+def threshold_grid(
+    league: str,
+    games: pd.DataFrame,
+    scope: str,
+    start_year: int | None,
+    end_year: int | None,
+    percentiles: list[float],
+) -> tuple[list[dict[str, object]], pd.DataFrame]:
+    sample, margin_distribution = _prepare_sample(games, start_year, end_year)
     sample.attrs["margin_count"] = len(margin_distribution)
     if not len(margin_distribution):
         raise ValueError(f"{league} has no valid margins for {scope}.")
+    model_state = _model_state(sample)
     rows = []
+    fitted_by_cutoff: dict[float, dict[str, object]] = {}
     for percentile in percentiles:
         cutoff = empirical_cutoff(margin_distribution, percentile)
-        result = fit_first_stage(sample, cutoff, percentile, scope)
+        is_new_cutoff = cutoff not in fitted_by_cutoff
+        if is_new_cutoff:
+            fitted_by_cutoff[cutoff] = fit_first_stage(sample, cutoff, percentile, scope, model_state)
+        result = fitted_by_cutoff[cutoff].copy()
+        result["percentile"] = float(percentile)
         result["league"] = league
         result["n_games_in_margin_distribution"] = int(len(margin_distribution))
         result["actual_game_share_at_or_below_cutoff"] = float(margin_distribution.le(cutoff).mean())
         rows.append(result)
-        print(
-            f"{scope} {league} p={percentile:.4f} cutoff={cutoff:g} "
-            f"F={result['joint_F_classical']:.2f} home-team-cluster-p={result['joint_p_home_team_cluster']:.4g}",
-            flush=True,
-        )
+        if is_new_cutoff:
+            print(
+                f"{scope} {league} cutoff={cutoff:g} F={result['joint_F_classical']:.2f} "
+                f"home-team-cluster-p={result['joint_p_home_team_cluster']:.4g}",
+                flush=True,
+            )
     return rows, sample
+
+
+def threshold_percentiles(distributions: list[pd.Series], anchor_percentile: float) -> list[float]:
+    """Cover each observed margin cutoff transition plus a 1-point percentile grid."""
+    candidates = set(GRID)
+    candidates.add(float(anchor_percentile))
+    for values in distributions:
+        ordered = np.sort(pd.to_numeric(values, errors="coerce").dropna().to_numpy(dtype=float))
+        if not len(ordered):
+            continue
+        transition_indices = np.r_[0, np.flatnonzero(ordered[1:] != ordered[:-1]) + 1]
+        candidates.update((transition_indices + 1).astype(float) / len(ordered))
+    return sorted(value for value in candidates if 0 < value < 1)
 
 
 def _choose_thresholds(grid: pd.DataFrame, anchor_percentile: float) -> tuple[dict[str, object], str]:
@@ -249,37 +314,24 @@ def main() -> None:
     pd.DataFrame([nfl_anchor]).to_csv(RESULTS / "nfl_reference.csv", index=False)
     nfl_seasons.to_csv(RESULTS / "nfl_season_coverage.csv", index=False)
 
-    percentiles = sorted(set(GRID + [anchor_percentile]))
+    mlb_distribution = _prepare_sample(mlb, ANALYSIS_START_YEAR, ANALYSIS_END_YEAR)[1]
+    nba_distribution = _prepare_sample(nba, ANALYSIS_START_YEAR, ANALYSIS_END_YEAR)[1]
+    percentiles = threshold_percentiles([mlb_distribution, nba_distribution], anchor_percentile)
     all_rows: list[dict[str, object]] = []
-    primary_samples: dict[str, pd.DataFrame] = {}
     for league, games in [("MLB", mlb), ("NBA", nba)]:
-        rows, sample = threshold_grid(league, games, PRIMARY_SCOPE, 1960, percentiles)
+        rows, sample = threshold_grid(
+            league,
+            games,
+            PRIMARY_SCOPE,
+            ANALYSIS_START_YEAR,
+            ANALYSIS_END_YEAR,
+            percentiles,
+        )
         all_rows.extend(rows)
-        primary_samples[league] = sample
 
     grid = pd.DataFrame(all_rows).sort_values(["scope", "percentile", "league"])
     grid.to_csv(RESULTS / "common_percentile_grid.csv", index=False)
     selected, selection_mode = _choose_thresholds(grid, anchor_percentile)
-
-    sensitivity_rows: list[dict[str, object]] = []
-    full_samples: dict[str, pd.DataFrame] = {}
-    for league, games in [("MLB", mlb), ("NBA", nba)]:
-        sample, distribution = _prepare_sample(games, None)
-        sample.attrs["margin_count"] = len(distribution)
-        full_samples[league] = sample
-        chosen_p = selected[league]
-        p_values = {anchor_percentile}
-        if chosen_p is not None:
-            p_values.add(float(chosen_p))
-        for percentile in sorted(p_values):
-            cutoff = empirical_cutoff(distribution, percentile)
-            result = fit_first_stage(sample, cutoff, percentile, "full_history_sensitivity")
-            result["league"] = league
-            result["n_games_in_margin_distribution"] = int(len(distribution))
-            result["actual_game_share_at_or_below_cutoff"] = float(distribution.le(cutoff).mean())
-            sensitivity_rows.append(result)
-    sensitivity = pd.DataFrame(sensitivity_rows)
-    sensitivity.to_csv(RESULTS / "full_history_sensitivity.csv", index=False)
 
     selected_rows = []
     first_stage_rows = []
@@ -290,7 +342,7 @@ def main() -> None:
             selected_status = "NFL_anchor_retained_no_threshold_met_F10_and_p05"
         else:
             selected_status = f"selected_{selection_mode}"
-        sample, distribution = _prepare_sample(games, 1960)
+        sample, distribution = _prepare_sample(games, ANALYSIS_START_YEAR, ANALYSIS_END_YEAR)
         cutoff = empirical_cutoff(distribution, float(percentile))
         home_share = float(distribution.le(cutoff).mean())
         model_row = grid.loc[
@@ -343,23 +395,34 @@ def main() -> None:
     )
     common_success = selection_mode == "common_percentile"
     nfl_incomplete = nfl_anchor["incomplete_season_game_counts"].replace(";", ", ") or "None"
-    max_grid = (
-        grid.loc[grid["scope"].eq(PRIMARY_SCOPE)]
-        .sort_values("joint_F_classical", ascending=False)
-        .drop_duplicates("league")
-    )
+    primary_grid = grid.loc[grid["scope"].eq(PRIMARY_SCOPE)]
+    max_grid_rows = []
+    for _, league_rows in primary_grid.groupby("league"):
+        maximum = league_rows["joint_F_classical"].max()
+        tied_rows = league_rows.loc[np.isclose(league_rows["joint_F_classical"], maximum)]
+        max_grid_rows.append(tied_rows.iloc[(tied_rows["percentile"] - anchor_percentile).abs().argmin()])
+    max_grid = pd.DataFrame(max_grid_rows)
     max_grid_text = "; ".join(
-        f"{row.league}: F={row.joint_F_classical:.2f} at p={row.percentile:.0%} (cutoff {row.margin_cutoff:g})"
+        f"{row.league}: F={row.joint_F_classical:.2f} at p={row.percentile:.6%} "
+        f"(cutoff {row.margin_cutoff:g}; close share {row.actual_game_share_at_or_below_cutoff:.5%})"
         for row in max_grid.itertuples()
     )
     anchor_shares = "; ".join(
         f"{row.league}: {row.share_of_game_margins_at_or_below_cutoff:.2%} (cutoff {row.margin_cutoff:g})"
         for row in selected_frame.itertuples()
     )
-    full_anchor = sensitivity.loc[np.isclose(sensitivity["percentile"], anchor_percentile)]
-    full_anchor_text = "; ".join(
-        f"{row.league}: F={row.joint_F_classical:.2f}, clustered p={row.joint_p_home_team_cluster:.3f}"
-        for row in full_anchor.itertuples()
+    max_cluster_rows = []
+    for _, league_rows in primary_grid.groupby("league"):
+        maximum = league_rows["joint_F_home_team_cluster"].max()
+        tied_rows = league_rows.loc[np.isclose(league_rows["joint_F_home_team_cluster"], maximum)]
+        max_cluster_rows.append(tied_rows.iloc[(tied_rows["percentile"] - anchor_percentile).abs().argmin()])
+    max_cluster = pd.DataFrame(max_cluster_rows)
+    max_cluster_text = "; ".join(
+        f"{row.league}: cluster-Wald F={row.joint_F_home_team_cluster:.2f} at p={row.percentile:.6%} "
+        f"(cutoff {row.margin_cutoff:g}; close share {row.actual_game_share_at_or_below_cutoff:.5%}; "
+        f"conventional F={row.joint_F_classical:.2f}; clustered p={row.joint_p_home_team_cluster:.3g}; "
+        f"active IVs={row.active_instruments})"
+        for row in max_cluster.itertuples()
     )
 
     lines = [
@@ -369,7 +432,7 @@ def main() -> None:
         "",
         "This run cleans the three supplied game files, then estimates first-stage attendance regressions for the MLB and NBA only. It does not estimate the home-win outcome equation or a second-stage IV effect.",
         "",
-        "The main first-stage screen follows the existing notebook's proposed January 1960 cutoff for both MLB and NBA. Full-history results are reported separately as a sensitivity check because the notebook described that cutoff as provisional.",
+        f"The MLB and NBA current-game analysis is restricted to calendar years {ANALYSIS_START_YEAR}–{ANALYSIS_END_YEAR}, matching the years covered by the supplied NFL file. The cleaned source files retain their full history; prior-game links are built from the full schedules before the current-game date restriction.",
         "",
         "## NFL reference coverage",
         "",
@@ -381,15 +444,15 @@ def main() -> None:
         "## First-stage findings",
         "",
         f"NFL-anchor percentile first-stage test passes F > 10 and home-team-cluster p < .05 in both leagues: {both_anchor_pass}.",
-        f"Common percentile in the tested 5%–95% grid passes both criteria in both leagues: {common_success}.",
+        f"Common percentile in the tested 1%–99% grid and observed margin cutoffs passes both criteria in both leagues: {common_success}.",
         f"Threshold selection mode: {selection_mode}.",
-        f"Largest conventional joint F in the full tested grid: {max_grid_text}.",
+        f"Largest conventional joint partial F in the full tested grid: {max_grid_text}.",
+        f"Largest home-team-clustered Wald F by league: {max_cluster_text}.",
         f"At the NFL anchor percentile, the discrete MLB/NBA score distributions yield achieved close-game shares of {anchor_shares}.",
-        f"Full-history estimates at the NFL anchor: {full_anchor_text}.",
         "",
         "The selected first-stage model includes home-team, away-team, season, game-type, weekday, and month fixed effects. The excluded instruments are separate indicators for a close immediately previous game by the current home and away teams. Standard errors are clustered by current home team. The conventional joint partial F is reported alongside the home-team-cluster F and p-value.",
         "",
-        "No tested threshold from the 5th through 95th percentile meets the F > 10 screen in either league; therefore no league-specific alternative is selected and the NFL anchor is retained for the prepared samples. F > 10 is a relevance screen, not evidence that the exclusion restriction holds. A previous close game can affect later team confidence or performance directly, so the exclusion restriction remains unresolved. No second-stage estimate is included.",
+        "No tested threshold from the 1st through 99th percentile or any observed margin-cutoff transition has a conventional joint partial F above 10 in either league; therefore no league-specific alternative is selected and the NFL anchor is retained for the prepared samples. Clustered Wald p-values fall below .05 at some cutoffs, but the corresponding conventional partial Fs remain below 10. The largest clustered Wald tests occur at degenerate endpoints that classify almost no NBA games or almost every MLB game as close; those sparse or nearly constant indicators are not treated as useful first stages. F > 10 is a relevance screen, not evidence that the exclusion restriction holds. A previous close game can affect later team confidence or performance directly, so the exclusion restriction remains unresolved. No second-stage estimate is included.",
         "",
         "## Cleaning decisions",
         "",
@@ -400,7 +463,7 @@ def main() -> None:
         "- NBA preseason games and MLB exhibitions/All-Star games are excluded from the franchise-game history. Playoffs and in-season NBA cup games remain in the data.",
         "- NFL January/February dates are assigned to the calendar year after the season-start year; the season ID remains the source `year` field.",
         "",
-        "See `nfl_reference.csv`, `common_percentile_grid.csv`, `selected_thresholds.csv`, `selected_first_stage.csv`, and `full_history_sensitivity.csv` for counts, cutoffs, coefficients, and F statistics.",
+        "See `nfl_reference.csv`, `common_percentile_grid.csv`, `selected_thresholds.csv`, and `selected_first_stage.csv` for counts, cutoffs, coefficients, and F statistics.",
         "",
     ]
     (RESULTS / "report.md").write_text("\n".join(lines), encoding="utf-8")

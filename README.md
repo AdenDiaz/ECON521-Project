@@ -16,9 +16,11 @@ The NFL source file covers seasons **2001–2019**, with calendar dates from 200
 
 ## First-stage result
 
-The NFL anchor maps to an MLB cutoff of 1 run and an NBA cutoff of 5 points. In the main 1960-onward samples, the joint excluded-instrument F statistics are 1.08 for MLB and 0.07 for NBA. Neither league meets the requested F > 10 relevance screen. A common grid from the 5th through 95th percentile was searched, including league-specific alternatives; the largest conventional joint F was 2.03 for MLB (85th percentile) and 2.53 for NBA (65th percentile). Home-team-clustered p-values at those largest-F thresholds are 0.102 and 0.072. Full-history sensitivity results are in `results/first_stage/full_history_sensitivity.csv`.
+The supplied NFL file covers calendar years 2001–2019, so current-game MLB/NBA first stages are restricted to those same years. At the 22.94% NFL anchor, the cutoff is 1 run for MLB (28.25% achieved close share) and 5 points for NBA (27.81%). The conventional joint partial F statistics are 3.47 for MLB and 1.72 for NBA; neither meets F > 10.
 
-No tested threshold meets both F > 10 and the 5% clustered-significance screen, so the processed first-stage samples retain the NFL anchor and are explicitly marked as not passing F > 10. The threshold search is documented in `results/first_stage/report.md` and its CSV outputs. These findings should be considered before proceeding to a second stage.
+At the NFL anchor, the home-team-clustered Wald p-values are 0.014 for MLB and 0.068 for NBA. The search tests each integer percentile from 1% through 99%, every observed margin-cutoff transition, and the exact NFL anchor. No conventional joint partial F exceeds 10. The highest conventional F is 3.47 for MLB at a 1-run cutoff and 4.17 for NBA at a zero-point cutoff. Some other thresholds have clustered Wald p-values below .05, but their conventional partial F values remain below 10. The largest clustered Wald F values (184.99 for NBA and 21.39 for MLB) occur at near-degenerate cutoffs that classify 0.008% of NBA prior games or 99.998% of MLB prior games as close; they are not treated as useful first stages. The complete grid and edge cases are documented in `results/first_stage/report.md` and `results/first_stage/common_percentile_grid.csv`.
+
+Because no tested threshold meets F > 10, the processed first-stage samples retain the NFL anchor and are explicitly marked as not passing that relevance screen. The repository stops before the second stage, as requested.
 
 ## Data and folders
 
@@ -48,7 +50,7 @@ The preparation script keeps raw files unchanged. It standardizes dates, season 
 
 Attendance must be positive and numeric for a current-game first-stage observation. NBA attendance below 100 or above 100,000 is flagged as implausible. Ambiguous same-day MLB doubleheader order is marked and not used for lag construction. NFL January/February dates are assigned to the calendar year after the season-start year, while `season_id` remains the source season year.
 
-The main MLB and NBA screen starts in January 1960, matching the exploratory notebook's provisional scope; full-history sensitivity is also reported. The percentile grid tests 5%, 10%, …, 95% plus the exact NFL anchor. The models include home-team, away-team, season, game-type, weekday, and month fixed effects, and use separate close-prior-game indicators for the current home and away teams. Standard errors are clustered by current home team.
+Only current games in calendar years 2001–2019 enter the MLB/NBA first-stage samples; cleaned files and prior-game histories preserve full source coverage. The percentile search tests 1%, 2%, up through 99%, each discrete margin-cutoff transition, and the exact NFL anchor. The models include home-team, away-team, season, game-type, weekday, and month fixed effects, and use separate close-prior-game indicators for the current home and away teams. Standard errors are clustered by current home team.
 
 ## Data sources
 
