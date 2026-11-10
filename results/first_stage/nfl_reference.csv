@@ -1,0 +1,2 @@
+requested_season_start,requested_season_end,observed_season_start,observed_season_end,observed_date_start,observed_date_end,games_with_valid_margin,games_with_abs_margin_le_3,nfl_anchor_percentile,complete_256_game_seasons,incomplete_season_game_counts,complete_seasons_games,complete_seasons_share_le_3
+2000,2023,2001,2019,2001-09-09,2019-12-29,4808,1103,0.22940931780366056,2003;2004;2005;2006;2007;2008;2009;2010;2011;2012;2013;2014;2015;2018;2019,2001:248;2002:240;2016:240;2017:240,3840,0.22760416666666666

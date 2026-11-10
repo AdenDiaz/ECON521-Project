@@ -1,0 +1,4 @@
+league,rows_with_unavailable_home_history,rows_with_unavailable_away_history,home_ambiguous_order_rows,away_ambiguous_order_rows
+NBA,892,771,1,5
+MLB,1536,1542,6,11
+NFL,303,301,0,0

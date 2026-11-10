@@ -1,0 +1,10 @@
+league,quality,rows
+NBA,valid,66795
+NBA,missing_source_value,5029
+NBA,implausible_high_value,2
+NBA,implausible_low_value,1
+MLB,valid,202106
+MLB,non_positive_value,20955
+MLB,missing_source_value,3158
+MLB,non_numeric_source_value,2
+NFL,valid,4808

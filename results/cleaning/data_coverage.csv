@@ -1,0 +1,4 @@
+league,raw_rows,cleaned_game_rows,game_type_excluded_rows,rows_dropped_missing_game_key,duplicate_game_ids,ambiguous_same_day_team_groups,date_min,date_max,season_min,season_max,rows_with_valid_attendance,rows_with_valid_scores,tied_games,rows_with_home_prior_margin,rows_with_away_prior_margin
+NBA,71827,70025,1802,0,0,2,1946-11-26 19:00:00,2025-04-28 22:00:00,1946,2024,65213,70025,4,69133,69254
+MLB,226221,223655,2566,0,0,5,1897-04-19 00:00:00,2025-11-01 00:00:00,1897,2025,200893,223655,993,222119,222113
+NFL,4808,4808,0,0,0,0,2001-09-09 00:00:00,2019-12-29 00:00:00,2001,2019,4808,4808,10,4505,4507
