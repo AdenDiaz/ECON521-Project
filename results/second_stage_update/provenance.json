@@ -1,0 +1,23 @@
+{
+  "source_branch": "main",
+  "source_commit": "51c94a98731180e5be3415892c6846a0590f0250",
+  "run_utc": "2026-11-19T19:52:19.147104+00:00",
+  "python": "3.12.14",
+  "analysis_scope": "new preliminary second-stage extension",
+  "covariance": "two-way home-team/date CGM; per-component CR1 G/(G-1)*(N-1)/(N-Kfull); exact two-way FE rank plus residualized control rank and treatment/instrument",
+  "inference": "t df=min(home-team,date clusters)-1; no small-cluster bootstrap",
+  "files": {
+    "Data\\processed\\mlb_first_stage_sample.csv": "e89039ff7f47fdba248c8da98b6bcf449707e8d2e4f7d7e53e504be4638a6878",
+    "Data\\processed\\mlb_games_clean.csv": "325e53d4e700897a5ab9fc3d24115d809e54e68ad7ed51044729c6cc91cc4d2b",
+    "Data\\processed\\nba_first_stage_sample.csv": "2457100893766fb0cead9ee0bbff7b98f5425c2bf417cfaf6c75627579e5b391",
+    "Data\\processed\\nba_games_clean.csv": "b24ace62d15b1eb977ec3c85778e14eb42a2f6129ee043c531a908ccfb01f5c8",
+    "Data\\processed\\nfl_games_clean.csv": "413d7e2bfeff21f877783d49b301ab65f739a673a7e50055eedb9e2843525913",
+    "Data\\raw\\MLB Data.csv": "9f5e08ec139ab7b858e8bd592ac817b19a444c91138326b01b8ef03d95254894",
+    "Data\\raw\\NBA Data.csv": "18e22e186af6074ce3897b9129d1f0a7f82452fce43bea4e23498ab865a0752d",
+    "Data\\raw\\NFL Data.csv": "8ce3934222b8eb4fe05a57b217c2075ebc90c8870800b849cfa21bfb1d6a4ed0",
+    "scripts\\second_stage_update\\weekend_iv.py": "2a6a1d199152c9c820c52d81324b43bc7791a57407b24ad34da8c07f1058f290",
+    "scripts\\second_stage_update\\analysis_plan.md": "3c4ebd8efdbbc6318ae04706232a75b1192a183c8ac3f284101cb390f78646a2",
+    "scripts\\second_stage_update\\requirements.lock.txt": "dbe9bf2908a5e67e57346c3b7cdb198205362dc9bc63bc68fb50df9258bb2a1d"
+  },
+  "trusted_library_validation": "Both main models independently match linearmodels IV2SLS after full absorbed-FE df correction; separate validation JSON files."
+}

@@ -1,0 +1,189 @@
+{
+  "leagues": [
+    {
+      "league": "MLB",
+      "clean_rows_full_source": 223655,
+      "clean_rows_2001_2019": 46806,
+      "clean_unique_game_ids": true,
+      "clean_unique_source_rows": true,
+      "window_missing_attendance": 214,
+      "window_positive_attendance": 46592,
+      "window_missing_outcome": 0,
+      "window_tied_scores": 5,
+      "first_stage_rows": 46300,
+      "regular_first_stage_rows": 45647,
+      "regular_tied_scores_excluded": 5,
+      "regular_decisive_rows_missing_lag_controls_excluded": 0,
+      "bad_nba_prior_tied_scores_by_side": {
+        "home": 0,
+        "away": 0
+      },
+      "main_n": 45642,
+      "main_date_min": "2001-04-03 00:00:00",
+      "main_date_max": "2019-09-29 00:00:00",
+      "main_season_ids": [
+        2001,
+        2002,
+        2003,
+        2004,
+        2005,
+        2006,
+        2007,
+        2008,
+        2009,
+        2010,
+        2011,
+        2012,
+        2013,
+        2014,
+        2015,
+        2016,
+        2017,
+        2018,
+        2019
+      ],
+      "raw_join_match_rate": 1.0,
+      "raw_id_match_rate": 1.0,
+      "prior_join_match_rate": 1.0,
+      "all_prior_games_same_season_and_chronological": true,
+      "main_missing_start_hour": 2394,
+      "main_doubleheader_rows": 765,
+      "main_weekend_n": 14831,
+      "main_weekday_n": 30811,
+      "main_attendance_mean": 30179.58720038561,
+      "main_attendance_sd": 10724.136045329948,
+      "main_home_win_mean": 0.5388457999211252,
+      "main_weekend_raw_mean_attendance": 33731.19122109096,
+      "main_weekday_raw_mean_attendance": 28470.008178897147,
+      "ties": [
+        {
+          "game_id": "NYA200109300",
+          "date_key": "2001-09-30",
+          "home_score": 1,
+          "away_score": 1,
+          "attendance": 55351.0
+        },
+        {
+          "game_id": "ATL200208150",
+          "date_key": "2002-08-15",
+          "home_score": 3,
+          "away_score": 3,
+          "attendance": 35340.0
+        },
+        {
+          "game_id": "BAL200309180",
+          "date_key": "2003-09-18",
+          "home_score": 1,
+          "away_score": 1,
+          "attendance": 29093.0
+        },
+        {
+          "game_id": "CIN200506300",
+          "date_key": "2005-06-30",
+          "home_score": 2,
+          "away_score": 2,
+          "attendance": 19903.0
+        },
+        {
+          "game_id": "PIT201609290",
+          "date_key": "2016-09-29",
+          "home_score": 1,
+          "away_score": 1,
+          "attendance": 19991.0
+        }
+      ],
+      "attendance_units": "recorded persons; no stadium-capacity normalization or paid-versus-present validation",
+      "weekend_definition": "stored calendar game date Saturday/Sunday; no timezone correction",
+      "game_hour_caveat": "recorded start hour, source does not establish scheduled versus realized time or timezone"
+    },
+    {
+      "league": "NBA",
+      "clean_rows_full_source": 70025,
+      "clean_rows_2001_2019": 24595,
+      "clean_unique_game_ids": true,
+      "clean_unique_source_rows": true,
+      "window_missing_attendance": 5,
+      "window_positive_attendance": 24590,
+      "window_missing_outcome": 0,
+      "window_tied_scores": 2,
+      "first_stage_rows": 24264,
+      "regular_first_stage_rows": 22699,
+      "regular_tied_scores_excluded": 2,
+      "regular_decisive_rows_missing_lag_controls_excluded": 4,
+      "bad_nba_prior_tied_scores_by_side": {
+        "home": 2,
+        "away": 2
+      },
+      "main_n": 22693,
+      "main_date_min": "2001-01-01 15:30:00",
+      "main_date_max": "2019-12-31 20:00:00",
+      "main_season_ids": [
+        2000,
+        2001,
+        2002,
+        2003,
+        2004,
+        2005,
+        2006,
+        2007,
+        2008,
+        2009,
+        2010,
+        2011,
+        2012,
+        2013,
+        2014,
+        2015,
+        2016,
+        2017,
+        2018,
+        2019
+      ],
+      "raw_join_match_rate": 1.0,
+      "raw_id_match_rate": 1.0,
+      "prior_join_match_rate": 1.0,
+      "all_prior_games_same_season_and_chronological": true,
+      "main_missing_start_hour": 0,
+      "main_doubleheader_rows": 0,
+      "main_weekend_n": 6266,
+      "main_weekday_n": 16427,
+      "main_attendance_mean": 17450.627814744636,
+      "main_attendance_sd": 2679.5456040064773,
+      "main_home_win_mean": 0.5957784338782884,
+      "main_weekend_raw_mean_attendance": 17959.142515161187,
+      "main_weekday_raw_mean_attendance": 17256.657332440493,
+      "ties": [
+        {
+          "game_id": "21000028",
+          "date_key": "2010-10-29",
+          "home_score": 90,
+          "away_score": 90,
+          "attendance": 20060.0
+        },
+        {
+          "game_id": "20400090",
+          "date_key": "2004-11-13",
+          "home_score": 105,
+          "away_score": 105,
+          "attendance": 16362.0
+        }
+      ],
+      "attendance_units": "recorded persons; no stadium-capacity normalization or paid-versus-present validation",
+      "weekend_definition": "stored calendar game date Saturday/Sunday; no timezone correction",
+      "game_hour_caveat": "recorded start hour, source does not establish scheduled versus realized time or timezone"
+    }
+  ],
+  "NFL": {
+    "n": 4808,
+    "attendance_valid": 4808,
+    "decisive": 4798,
+    "ties": 10,
+    "missing_outcomes": 0,
+    "weekend_n": 4275,
+    "weekday_n": 533,
+    "season_min": 2001,
+    "season_max": 2019,
+    "role": "calibration only; raw game outcomes are available, but no NFL causal model is estimated",
+    "reason": "89% weekend schedule, mostly Sunday; league-specific scheduling/selection controls need separate justification"
+  }
+}

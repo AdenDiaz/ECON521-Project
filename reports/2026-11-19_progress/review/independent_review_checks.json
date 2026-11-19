@@ -1,0 +1,209 @@
+{
+  "checks": [
+    {
+      "league": "MLB",
+      "spec": "calendar_week",
+      "n": 45642,
+      "invariants": "all pass"
+    },
+    {
+      "league": "MLB",
+      "spec": "main",
+      "n": 45642,
+      "invariants": "all pass"
+    },
+    {
+      "league": "MLB",
+      "spec": "no_doubleheaders",
+      "n": 44877,
+      "invariants": "all pass"
+    },
+    {
+      "league": "MLB",
+      "spec": "pooled_month",
+      "n": 45642,
+      "invariants": "all pass"
+    },
+    {
+      "league": "MLB",
+      "spec": "recorded_hour",
+      "n": 45642,
+      "invariants": "all pass"
+    },
+    {
+      "league": "NBA",
+      "spec": "calendar_week",
+      "n": 22693,
+      "invariants": "all pass"
+    },
+    {
+      "league": "NBA",
+      "spec": "main",
+      "n": 22693,
+      "invariants": "all pass"
+    },
+    {
+      "league": "NBA",
+      "spec": "pooled_month",
+      "n": 22693,
+      "invariants": "all pass"
+    },
+    {
+      "league": "NBA",
+      "spec": "recorded_hour",
+      "n": 22693,
+      "invariants": "all pass"
+    }
+  ],
+  "slide_count": 12,
+  "native_tables": [
+    {
+      "slide": 1,
+      "tables": 0
+    },
+    {
+      "slide": 2,
+      "tables": 1
+    },
+    {
+      "slide": 3,
+      "tables": 1
+    },
+    {
+      "slide": 4,
+      "tables": 0
+    },
+    {
+      "slide": 5,
+      "tables": 1
+    },
+    {
+      "slide": 6,
+      "tables": 1
+    },
+    {
+      "slide": 7,
+      "tables": 0
+    },
+    {
+      "slide": 8,
+      "tables": 0
+    },
+    {
+      "slide": 9,
+      "tables": 1
+    },
+    {
+      "slide": 10,
+      "tables": 0
+    },
+    {
+      "slide": 11,
+      "tables": 0
+    },
+    {
+      "slide": 12,
+      "tables": 0
+    }
+  ],
+  "chart_refs": [
+    {
+      "slide": 1,
+      "chart_refs": 0
+    },
+    {
+      "slide": 2,
+      "chart_refs": 0
+    },
+    {
+      "slide": 3,
+      "chart_refs": 0
+    },
+    {
+      "slide": 4,
+      "chart_refs": 0
+    },
+    {
+      "slide": 5,
+      "chart_refs": 1
+    },
+    {
+      "slide": 6,
+      "chart_refs": 0
+    },
+    {
+      "slide": 7,
+      "chart_refs": 1
+    },
+    {
+      "slide": 8,
+      "chart_refs": 0
+    },
+    {
+      "slide": 9,
+      "chart_refs": 0
+    },
+    {
+      "slide": 10,
+      "chart_refs": 1
+    },
+    {
+      "slide": 11,
+      "chart_refs": 0
+    },
+    {
+      "slide": 12,
+      "chart_refs": 0
+    }
+  ],
+  "slide_text": [
+    {
+      "slide": 1,
+      "text": "Fan attendance and home-team performance\nAden Diaz | ECON521 | Research progress | November 19, 2026\n01\nDoes a larger crowd increase\nthe probability of a home win?\nMLB and NBA evidence, with NFL as a calibration reference\nPrevious-game closeness \u2192 alternative IV search \u2192 weekend candidate\nNew in this update: preliminary OLS, reduced form and 2SLS"
+    },
+    {
+      "slide": 2,
+      "text": "Research motivation and the seed paper\nSources: Ganz & Allsop (2024; online 2023), pp. 31, 35\u201336, 41, 44\u201345 (PDF pp. 2, 6\u20137, 12, 15\u201316); README.md\n02\nCrowds may affect effort, communication and officiating. Better teams also attract more fans, so attendance\u2013win correlations need not be causal.\n\nGanz & Allsop\nThis project\nSample\n2020\u201321 NBA; 808 games, 27 home teams\n2001\u20132019 MLB and NBA\nAttendance / outcome\nReported fans, including zero / home point margin\nPositive recorded attendance / game home-win indicator\nInstrument\nCOVID capacity limits announced in advance\nPrior closeness, then exploratory weekend IV\nEffect of interest\nExtra fans in mostly empty arenas\nWeekend-induced attendance changes in normal seasons\nThe seed controls for team, month, recent 10-game performance and local COVID. Its 1.74 points per 1,000 fans is not comparable to a win-probability coefficient."
+    },
+    {
+      "slide": 3,
+      "text": "Table 1. Data coverage and estimation samples\nSources: results/cleaning/data_coverage.csv; results/first_stage/selected_first_stage.csv; new results/second_stage_update/data_audit.json\n03\nMeasure\nMLB\nNBA\nNFL\nCleaned source dates\n1897\u20132025\n1946\u20132025\n2001\u20132019\nCleaned games\n223,655\n70,025\n4,808\nHistorical first-stage N\n46,300\n24,264\nCalibration only\nNew regular-season IV N\n45,642\n22,693\nNot estimated\nNew mean attendance\n30,180\n17,451\n\u2014\nNew home-win share\n53.9%\n59.6%\n\u2014\nBroader scope: NBA, NFL and MLB. Completed estimation: MLB and NBA.\nNew samples: calendar 2001\u20132019, regular season, valid positive attendance, decisive score and complete pregame controls. NFL supplies the 22.94% closeness anchor."
+    },
+    {
+      "slide": 4,
+      "text": "The original previous-game-closeness design\nHISTORICAL DESIGN\nSources: scripts/first_stage.py; results/first_stage/report.md; README.md\n04\nPrior close game \u2192 fan interest \u2192 current attendance \u2192 home-team result\nSeparate instruments: did the current home team\u2019s and away team\u2019s immediately previous games end close?\nWhy it seemed plausible\nSuspense may raise demand before the next game. Score-margin cutoffs have a simple interpretation across leagues.\nWhy validity was unresolved\nCloseness can reflect team quality, fatigue and momentum. Those channels may change the next result directly.\nNFL reference: |score margin| \u2264 3 in 1,103 / 4,808 games (22.94%). The same percentile maps to \u2264 1 MLB run and \u2264 5 NBA points; discrete shares differ."
+    },
+    {
+      "slide": 5,
+      "text": "Closeness produced weak first stages\nTABLE 2 AND FIGURE 1 | HISTORICAL RESULTS\nSources: results/first_stage/selected_first_stage.csv; common_percentile_grid.csv; report.md\n05\nNFL-anchor specification\nMLB\nNBA\nPrior-game cutoff\n1 run\n5 points\nAchieved close share\n28.25%\n27.81%\nGames\n46,300\n24,264\nClassical joint partial F\n3.47\n1.72\nHome-team Wald F\n4.90\n2.95\nNo tested cutoff had classical joint partial F > 10\nFigure 1 displays integer percentiles 1\u201399. Full transition grid also tested; extreme clustered Wald spikes come from nearly degenerate indicators. F > 10 is only a relevance screen."
+    },
+    {
+      "slide": 6,
+      "text": "Table 3. The exploratory alternative-IV search\nHISTORICAL RESULTS | 772 CANDIDATE / SPECIFICATION ROWS\nSources: results/instrument_candidates/expanded_candidate_report.md and underlying robustness CSVs; all_candidate_inventory.csv\n06\nCandidate\nMLB F\nNBA F\nMain qualification\nWeekend (Sat/Sun)\n131.79\n64.93\nRest, travel, timing; no date FE\nHome opener\n193.25\n110.66\nCeremonies and selected rosters\nU.S. federal holiday\n43.34\n14.20\nSelected schedules; no date FE\nPrior 5 home gates\n206.13\n188.65\nPersistent demand and team quality\nDome outside cold\n14.86\n\u2014\nMLB only; 10 team clusters; cutoff search\nNBA weather threshold\n\u2014\n8.95\nTravel; searched windows / thresholds\nMetro conflict \u00b12h\n5.59*\n1.63*\nTraffic / selection; weak clustered F\nWeekend is the leading working candidate: clear fan-availability channel in both leagues\nF values are home-team/date Wald F, except * home-team-only baseline. Opener, prior gates and weather use date FE; weekend/holiday cannot. Models and samples differ."
+    },
+    {
+      "slide": 7,
+      "text": "Figure 2. Weekend relevance and robustness\nADJUSTED FIRST STAGES | NEW MAIN AND SENSITIVITY MODELS\nSources: historical team_season_fe_robustness.csv; new results/second_stage_update/model_results.csv\n07\nNew main model\nMLB: +5,386 fans\nWald F = 180.9\n\nNBA: +699 fans\nWald F = 46.8\nWeekend = Saturday/Sunday; Friday excluded. All bars are adjusted associations. Historical models include postseason and recorded hour; new models use regular-season samples. Date FE absorb weekend."
+    },
+    {
+      "slide": 8,
+      "text": "The preliminary second-stage specification\nNEW ANALYSIS | CHOICES FIXED BEFORE OUTCOME ESTIMATES WERE INSPECTED\nSources: new scripts/second_stage_update/analysis_plan.md and weekend_iv.py; model_results.csv\n08\nY = 1(home score > away score); A = attendance / 1,000; Z = Sat/Sun\nA = \u03c0Z + X\u03b3 + home-team\u00d7season FE + away-team\u00d7season FE + u\nY = \u03b2A + X\u03b4 + home-team\u00d7season FE + away-team\u00d7season FE + \u03b5\nSame X in both stages\nYear\u00d7month effects; home/away rest, prior-game result and signed margin. Main omits unverified current start hour; adds it in sensitivity.\nInference and identifying variation\nProper 2SLS structural-residual covariance, clustered by home team and game date. 32 MLB / 30 NBA team clusters. No date or weekday FE.\nOLS, first stage, reduced form and IV use identical observations and controls within each league. Sensitivities change time FE and omit MLB doubleheaders; no current-game outcome controls."
+    },
+    {
+      "slide": 9,
+      "text": "Table 4. Preliminary OLS, reduced form and 2SLS\nNEW ANALYSIS | CONDITIONAL ON THE IV ASSUMPTIONS\nSource: new results/second_stage_update/model_results.csv; main specification; 95% t intervals, home-team/date clustering\n09\nEstimate [95% CI]\nMLB\nNBA\nOLS: attendance \u2192 home win (pp / 1,000)\n-0.03 [-0.12, 0.06]\n-0.28 [-0.78, 0.21]\nFirst stage: weekend \u2192 attendance (1,000)\n5.39 [4.57, 6.20]\n0.70 [0.49, 0.91]\nReduced form: weekend \u2192 home win (pp)\n1.49 [0.64, 2.34]\n-0.76 [-2.19, 0.67]\n2SLS: attendance \u2192 home win (pp / 1,000)\n0.28 [0.10, 0.45]\n-1.09 [-3.02, 0.84]\nN; team / date clusters\n45,642; 32 / 3,392\n22,693; 30 / 3,033\nFirst stage: classical F / clustered Wald F\n8912.9 / 180.9\n947.0 / 46.8\npp = percentage points. A positive coefficient means a higher game-level home-win probability. These are linear probability models; intervals do not resolve exclusion or scheduling selection."
+    },
+    {
+      "slide": 10,
+      "text": "Figure 3. Preliminary attendance effects with uncertainty\nNEW ANALYSIS | HOME-WIN PROBABILITY CHANGE PER 1,000 FANS\nSource: new results/second_stage_update/model_results.csv and anderson_rubin.json; 95% intervals\n10\nOLS\nMLB -0.03 [-0.12, 0.06]\nNBA -0.28 [-0.78, 0.21]\nIV: main / week FE\nMLB: 0.28 / 0.25 pp\nNBA: -1.09 / -1.05 pp\n95% Anderson\u2013Rubin confidence sets (pp / 1,000): MLB [0.11, 0.46]; NBA [-2.94, 1.12]. Weak-IV robust conditional on validity; few-cluster uncertainty remains."
+    },
+    {
+      "slide": 11,
+      "text": "Weekend validity remains the central limitation\nSources: expanded_candidate_report.md; new data_audit.json and analysis_plan.md; research update report\n11\nWeekend changes more than fan availability\nRest and travel\nDays off do not fully measure fatigue, distance or time-zone changes.\nGame timing\nAdding recorded hour changes NBA IV from \u22121.09 to \u22120.41 pp; its pregame status is unverified.\nSchedule selection\nMatchups and high-demand games may be assigned selectively.\nDate FE would remove common daily shocks\u2014and the instrument itself.\nOther limits: exploratory candidate/threshold search, about 30 home-team clusters, attendance measurement and sellouts, stored NBA date/time convention, and MLB gate attribution in doubleheaders."
+    },
+    {
+      "slide": 12,
+      "text": "Current conclusions and next steps\nRepository snapshot: main @ 51c94a98731180e5be3415892c6846a0590f0250 | New extension dated November 19, 2026\n12\nCompleted previously\nCleaned MLB/NBA samples; weak closeness first stages; broad alternative-IV search.\nCompleted in this update\nPreliminary OLS, reduced form and 2SLS for both leagues; sensitivity estimates and weak-IV-robust intervals. Exclusion remains unresolved.\nNext priorities\nAudit rest, travel and timing balance; validate attendance and dates; strengthen the exclusion argument before causal claims.\nWeekend is a useful working candidate. Its causal interpretation remains conditional.\nNFL remains calibration only; a separate league design is planned."
+    }
+  ]
+}

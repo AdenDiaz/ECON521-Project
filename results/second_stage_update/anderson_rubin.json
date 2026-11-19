@@ -1,0 +1,290 @@
+[
+  {
+    "league": "MLB",
+    "specification": "main",
+    "confidence_level": 0.95,
+    "test": "single-instrument two-way clustered Anderson-Rubin t/F inversion",
+    "coefficient_units": "probability per 1,000 attendees",
+    "t_df": 31,
+    "confidence_set": {
+      "type": "bounded_interval",
+      "endpoints": [
+        0.0011349428671277458,
+        0.004642581758855629
+      ]
+    },
+    "zero_null_p": 0.0011769537087302634,
+    "covariance_rf_fs": [
+      [
+        1.7345082911096558e-05,
+        -0.0004120941207630553
+      ],
+      [
+        -0.0004120941207630553,
+        0.160362248505278
+      ]
+    ],
+    "quadratic": [
+      28.33716609309591,
+      -0.16371867493344272,
+      0.00014931037154151852
+    ],
+    "caveat": "weak-IV robust conditional on valid instrument; cluster asymptotics with few home-team clusters"
+  },
+  {
+    "league": "MLB",
+    "specification": "pooled_month",
+    "confidence_level": 0.95,
+    "test": "single-instrument two-way clustered Anderson-Rubin t/F inversion",
+    "coefficient_units": "probability per 1,000 attendees",
+    "t_df": 31,
+    "confidence_set": {
+      "type": "bounded_interval",
+      "endpoints": [
+        0.001001722345129168,
+        0.004689363138594426
+      ]
+    },
+    "zero_null_p": 0.0023748796237302904,
+    "covariance_rf_fs": [
+      [
+        1.9667587765526676e-05,
+        -0.00041858307170678665
+      ],
+      [
+        -0.00041858307170678665,
+        0.16227286658740986
+      ]
+    ],
+    "quadratic": [
+      28.45087769756703,
+      -0.16191637706381906,
+      0.0001336462863896213
+    ],
+    "caveat": "weak-IV robust conditional on valid instrument; cluster asymptotics with few home-team clusters"
+  },
+  {
+    "league": "MLB",
+    "specification": "calendar_week",
+    "confidence_level": 0.95,
+    "test": "single-instrument two-way clustered Anderson-Rubin t/F inversion",
+    "coefficient_units": "probability per 1,000 attendees",
+    "t_df": 31,
+    "confidence_set": {
+      "type": "bounded_interval",
+      "endpoints": [
+        0.0008702904729417486,
+        0.004359999523734915
+      ]
+    },
+    "zero_null_p": 0.003049418252880172,
+    "covariance_rf_fs": [
+      [
+        1.7813456599524226e-05,
+        -0.0004596074712071493
+      ],
+      [
+        -0.0004596074712071493,
+        0.16066227036706832
+      ]
+    ],
+    "quadratic": [
+      28.97504416457144,
+      -0.15154788364722252,
+      0.00010994482130835306
+    ],
+    "caveat": "weak-IV robust conditional on valid instrument; cluster asymptotics with few home-team clusters"
+  },
+  {
+    "league": "MLB",
+    "specification": "recorded_hour",
+    "confidence_level": 0.95,
+    "test": "single-instrument two-way clustered Anderson-Rubin t/F inversion",
+    "coefficient_units": "probability per 1,000 attendees",
+    "t_df": 31,
+    "confidence_set": {
+      "type": "bounded_interval",
+      "endpoints": [
+        0.0009476404430987154,
+        0.005233598667631614
+      ]
+    },
+    "zero_null_p": 0.004376364767581892,
+    "covariance_rf_fs": [
+      [
+        2.716347281783999e-05,
+        -0.00047436883033868276
+      ],
+      [
+        -0.00047436883033868276,
+        0.21856633820120522
+      ]
+    ],
+    "quadratic": [
+      28.984057458997768,
+      -0.17915738955321212,
+      0.00014374845490720427
+    ],
+    "caveat": "weak-IV robust conditional on valid instrument; cluster asymptotics with few home-team clusters"
+  },
+  {
+    "league": "MLB",
+    "specification": "no_doubleheaders",
+    "confidence_level": 0.95,
+    "test": "single-instrument two-way clustered Anderson-Rubin t/F inversion",
+    "coefficient_units": "probability per 1,000 attendees",
+    "t_df": 31,
+    "confidence_set": {
+      "type": "bounded_interval",
+      "endpoints": [
+        0.001263887158621624,
+        0.004676475513831004
+      ]
+    },
+    "zero_null_p": 0.0006365290074159671,
+    "covariance_rf_fs": [
+      [
+        1.6554332521445587e-05,
+        -0.00038620403067756175
+      ],
+      [
+        -0.00038620403067756175,
+        0.15797815761944278
+      ]
+    ],
+    "quadratic": [
+      28.77255468964299,
+      -0.17091940986945703,
+      0.00017006125913480183
+    ],
+    "caveat": "weak-IV robust conditional on valid instrument; cluster asymptotics with few home-team clusters"
+  },
+  {
+    "league": "NBA",
+    "specification": "main",
+    "confidence_level": 0.95,
+    "test": "single-instrument two-way clustered Anderson-Rubin t/F inversion",
+    "coefficient_units": "probability per 1,000 attendees",
+    "t_df": 29,
+    "confidence_set": {
+      "type": "bounded_interval",
+      "endpoints": [
+        -0.029411916497808423,
+        0.011233116680535681
+      ]
+    },
+    "zero_null_p": 0.2857074691523039,
+    "covariance_rf_fs": [
+      [
+        4.8961663145101536e-05,
+        -0.0003051968505385519
+      ],
+      [
+        -0.0003051968505385519,
+        0.010427962350694406
+      ]
+    ],
+    "quadratic": [
+      0.44458166047629805,
+      0.008081961008229338,
+      -0.0001468842188239066
+    ],
+    "caveat": "weak-IV robust conditional on valid instrument; cluster asymptotics with few home-team clusters"
+  },
+  {
+    "league": "NBA",
+    "specification": "pooled_month",
+    "confidence_level": 0.95,
+    "test": "single-instrument two-way clustered Anderson-Rubin t/F inversion",
+    "coefficient_units": "probability per 1,000 attendees",
+    "t_df": 29,
+    "confidence_set": {
+      "type": "bounded_interval",
+      "endpoints": [
+        -0.030241746743983482,
+        0.011367101918554737
+      ]
+    },
+    "zero_null_p": 0.283107862597922,
+    "covariance_rf_fs": [
+      [
+        5.059026716616718e-05,
+        -0.0003006476284463019
+      ],
+      [
+        -0.0003006476284463019,
+        0.010375062967107992
+      ]
+    ],
+    "quadratic": [
+      0.43957057674491756,
+      0.008296738511769187,
+      -0.00015110722869587473
+    ],
+    "caveat": "weak-IV robust conditional on valid instrument; cluster asymptotics with few home-team clusters"
+  },
+  {
+    "league": "NBA",
+    "specification": "calendar_week",
+    "confidence_level": 0.95,
+    "test": "single-instrument two-way clustered Anderson-Rubin t/F inversion",
+    "coefficient_units": "probability per 1,000 attendees",
+    "t_df": 29,
+    "confidence_set": {
+      "type": "bounded_interval",
+      "endpoints": [
+        -0.02879875602560771,
+        0.0115682173692064
+      ]
+    },
+    "zero_null_p": 0.29984929951268574,
+    "covariance_rf_fs": [
+      [
+        4.54896969663118e-05,
+        -0.00028846296556228113
+      ],
+      [
+        -0.00028846296556228113,
+        0.009233040900695136
+      ]
+    ],
+    "quadratic": [
+      0.4189982866000714,
+      0.007219566174228444,
+      -0.00013958939217081326
+    ],
+    "caveat": "weak-IV robust conditional on valid instrument; cluster asymptotics with few home-team clusters"
+  },
+  {
+    "league": "NBA",
+    "specification": "recorded_hour",
+    "confidence_level": 0.95,
+    "test": "single-instrument two-way clustered Anderson-Rubin t/F inversion",
+    "coefficient_units": "probability per 1,000 attendees",
+    "t_df": 29,
+    "confidence_set": {
+      "type": "bounded_interval",
+      "endpoints": [
+        -0.019506426093826874,
+        0.014578802003507408
+      ]
+    },
+    "zero_null_p": 0.6208218052371246,
+    "covariance_rf_fs": [
+      [
+        5.499613015226206e-05,
+        -0.00035180849947660364
+      ],
+      [
+        -0.00035180849947660364,
+        0.01275648814174663
+      ]
+    ],
+    "quadratic": [
+      0.7605861574618855,
+      0.0037478826722726994,
+      -0.00021629573775046315
+    ],
+    "caveat": "weak-IV robust conditional on valid instrument; cluster asymptotics with few home-team clusters"
+  }
+]
