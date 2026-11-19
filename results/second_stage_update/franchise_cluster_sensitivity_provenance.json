@@ -1,0 +1,17 @@
+{
+  "source_commit": "51c94a98731180e5be3415892c6846a0590f0250",
+  "mapping": {
+    "FLO": "FLO_MIA",
+    "MIA": "FLO_MIA",
+    "MON": "MON_WAS",
+    "WAS": "MON_WAS"
+  },
+  "primary_files_unchanged_sha256": {
+    "C:\\Users\\adend\\Documents\\Codex\\2026-11-19\\create-a-complete-research-progress-presentation\\work\\ECON521-Project\\results\\second_stage_update\\model_results.csv": "9a4e46deb4ca89111138bd2e7a65cf2b28eabf18f480eeed49e04eeb4996b534",
+    "C:\\Users\\adend\\Documents\\Codex\\2026-11-19\\create-a-complete-research-progress-presentation\\work\\ECON521-Project\\results\\second_stage_update\\anderson_rubin.json": "bfbba38af8445ffd3ad74125f686cc5b466011e5edbbbdc74c7a147672d887fe",
+    "C:\\Users\\adend\\Documents\\Codex\\2026-11-19\\create-a-complete-research-progress-presentation\\work\\ECON521-Project\\results\\second_stage_update\\data_audit.json": "a4216cef10c2bae5beb54b91a36d0a71ebf901847d4ea14dbc4c8fc60f667e63",
+    "C:\\Users\\adend\\Documents\\Codex\\2026-11-19\\create-a-complete-research-progress-presentation\\work\\ECON521-Project\\results\\second_stage_update\\provenance.json": "2c90049d16e3bbc66b919e1f00c853485c0d357207b45e88c68d137855939474"
+  },
+  "script_sha256": "44e88415320b68acfcf58158b8e558e87580da370b2e2cda05d3b8a1001c2f9e",
+  "trusted_iv_covariance_match": true
+}

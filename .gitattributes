@@ -1,0 +1,5 @@
+# Keep generated deliverables byte-for-byte intact across Windows checkouts.
+*.pdf binary
+*.pptx binary
+*.png binary
+*.zip binary

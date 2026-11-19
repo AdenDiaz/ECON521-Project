@@ -1,0 +1,15 @@
+{
+  "library": "linearmodels IV2SLS",
+  "coefficient_match": true,
+  "all_covariance_elements_match_after_full_FE_df_correction": true,
+  "coefficient_max_absolute_error": 1.27675647831893e-14,
+  "covariance_max_absolute_error": 6.034127190968075e-16,
+  "saved_model_results_coefficient_match": true,
+  "saved_model_results_standard_error_match": true,
+  "n": 45642,
+  "home_team_clusters": 32,
+  "date_clusters": 3392,
+  "full_model_rank": 1239,
+  "reproduction_command": "python scripts/second_stage_update/validate_main.py",
+  "validator_sha256": "45a1d4662d1c520e30aaa1420ac6889a99b7c114b050cf744e8f064d5dbad8dd"
+}

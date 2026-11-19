@@ -1,0 +1,21 @@
+{
+  "presentations/2026-11-19_progress/research_progress.pdf": "5eb159034d9e9e46f8a616e276ba1cfa95a91ef20b3d1c05f46b1c671a86eb43",
+  "presentations/2026-11-19_progress/research_progress.pptx": "954fa95dcb608949858df4d1f8cb1e7f8f87a071a90cb3fce870641e6dd1a7f6",
+  "presentations/2026-11-19_progress/source/build_slides.mjs": "4ca3e7b35cb676230426a5772ff5a68522751143455bc6c64a576ce63948e7a7",
+  "presentations/2026-11-19_progress/source/deck_data.json": "b4e3058edbf528d655490c20d01a9c849edba505c6fb0dbe4abcaed22c79d525",
+  "presentations/2026-11-19_progress/source/make_submission_pdf.py": "c93b6a44b75202ab306d1a010e638143742b5bee44b94e351f29ca6845902bc6",
+  "presentations/2026-11-19_progress/source/README.md": "e7b5ced394042f33a45ae79cd76dd24b08a20c377e74dccaab28b25aa7a0da0c",
+  "reports/2026-11-19_progress/PUBLICATION.md": "34b1e654146208ac1850bfdfe4fd404841e24b5e036e9c14bb5a0fc5abb0ad16",
+  "reports/2026-11-19_progress/report_assets/attendance_support.png": "e0acc5bbdcd984b89b1f5e97f1031cd0ef4fb4f39335cb748122a6432add9905",
+  "reports/2026-11-19_progress/report_assets/closeness_grid.png": "d65084d70067729545f61781f0e0125365d0e1f84614955bd0f781d020d6e7fa",
+  "reports/2026-11-19_progress/report_assets/outcome_sensitivities.png": "a139de6ba5b060af2d684f15ce74e0f0a383bdbfb26eb6622d2552512902b493",
+  "reports/2026-11-19_progress/report_assets/weekend_first_stages.png": "91a5e7ef7ab09aecde782d94a27cdd81699437f950f8da3a64fc696322b42038",
+  "reports/2026-11-19_progress/REPRODUCE.md": "83d04606b901e9d23f14e207713d517313b44dd248ba3e82f199dd2a34ad866b",
+  "reports/2026-11-19_progress/reproducibility_bundle.zip": "0be28d9e5a0c9b1f04492cb7d7fc191929da85e6f45eb31d293eb04559cba5f7",
+  "reports/2026-11-19_progress/research_update.md": "74c9aa49e474daa0401fae156b0c5622fe9d0d27963104a5521185453623ef18",
+  "reports/2026-11-19_progress/research_update.pdf": "8f91844a9ffccf3795d05082df403577171384ca09c21d1420ae86f0a215a562",
+  "reports/2026-11-19_progress/review/final_pptx_validation.json": "613704b687bc56182bc366fb3bdb7532f121fc94380ca2ff3bb928b45615ab18",
+  "reports/2026-11-19_progress/review/independent_review.md": "2ae7debf20ea809009024a49bfe560fb0815ac52acd3c8c541962235b1452321",
+  "reports/2026-11-19_progress/review/independent_review_checks.json": "954d4bdc7e71ede837a03a3828d77bc1c5b9a14bf3f292b4395ada1e76418d32",
+  "reports/2026-11-19_progress/source_map.md": "3ddbc6b2a18061af15707ae6af676f08ef9a3adf7af0143dc4dc5362d00f7a6d"
+}
